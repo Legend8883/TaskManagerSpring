@@ -9,6 +9,7 @@ import org.legend8883.taskmanager.globalException.dto.ValidationErrorResponse;
 import org.legend8883.taskmanager.globalException.dto.Violation;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -76,21 +77,6 @@ public class GlobalExceptionHandler {
         return new ValidationErrorResponse(violations);
     }
 
-    @ExceptionHandler(UsernameNotFoundException.class)
-    @ResponseBody
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public BaseErrorResponse handleUsernameNotFoundException(
-            UsernameNotFoundException e
-    ) {
-        log.error(e.getMessage(), e);
-
-        return new BaseErrorResponse(
-                "User not found",
-                e.getMessage(),
-                LocalDateTime.now()
-        );
-    }
-
     @ExceptionHandler(AuthException.class)
     @ResponseBody
     @ResponseStatus(HttpStatus.BAD_REQUEST)
@@ -116,6 +102,36 @@ public class GlobalExceptionHandler {
 
         return new BaseErrorResponse(
                 "Wrong username or password",
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    public BaseErrorResponse handleAuthorizationDeniedException(
+            AuthorizationDeniedException e
+    ) {
+        log.error(e.getMessage(), e);
+
+        return new BaseErrorResponse(
+                "You are not authorized to perform this action",
+                e.getMessage(),
+                LocalDateTime.now()
+        );
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    @ResponseBody
+    @ResponseStatus(HttpStatus.NOT_FOUND)
+    public BaseErrorResponse handleUsernameNotFoundException(
+            UsernameNotFoundException e
+    ) {
+        log.error(e.getMessage(), e);
+
+        return new BaseErrorResponse(
+                "User not found",
                 e.getMessage(),
                 LocalDateTime.now()
         );
