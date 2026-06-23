@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskManager</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0f0f11;
+    --surface: #17171a;
+    --surface2: #1e1e22;
+    --border: #2a2a30;
+    --accent: #7c6fcd;
+    --accent-dim: #7c6fcd22;
+    --accent-hover: #9585e0;
+    --text: #e8e8f0;
+    --text-dim: #888899;
+    --text-muted: #555566;
+    --danger: #e05c5c;
+    --success: #5cc98a;
+    --warn: #e0a45c;
+    --planned: #5c9ce0;
+    --running: #e0a45c;
+    --finished: #5cc98a;
+    --importance-vh: #e05c5c;
+    --importance-h: #e07a5c;
+    --importance-m: #e0c45c;
+    --importance-l: #7ab8e0;
+    --importance-vl: #888899;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  body {
+    font-family: 'Inter', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.5;
+  }
+
+  /* ── AUTH ── */
+  #auth-screen {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 400px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 40px 36px;
+  }
+
+  .auth-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 32px;
+    letter-spacing: -0.5px;
+  }
+
+  .auth-tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface2);
+    border-radius: var(--radius-sm);
+    padding: 4px;
+    margin-bottom: 28px;
+  }
+
+  .auth-tab {
+    flex: 1;
+    padding: 8px;
+    text-align: center;
+    font-size: 14px;
+    font-weight: 500;
+    border-radius: 4px;
+    cursor: pointer;
+    color: var(--text-dim);
+    transition: all 0.15s;
+    border: none;
+    background: none;
+  }
+
+  .auth-tab.active {
+    background: var(--accent);
+    color: #fff;
+  }
+
+  .form-group { margin-bottom: 16px; }
+
+  .form-label {
+    display: block;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .form-input {
+    width: 100%;
+    padding: 10px 14px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    color: var(--text);
+    font-size: 14px;
+    font-family: inherit;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+
+  .form-input:focus { border-color: var(--accent); }
+
+  .form-input::placeholder { color: var(--text-muted); }
+
+  select.form-input { cursor: pointer; }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 10px 18px;
+    border-radius: var(--radius-sm);
+    font-size: 14px;
+    font-weight: 500;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s;
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+    padding: 12px;
+  }
+
+  .btn-primary:hover { background: var(--accent-hover); }
+
+  .btn-ghost {
+    background: var(--surface2);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+
+  .btn-danger {
+    background: transparent;
+    color: var(--danger);
+    border: 1px solid var(--danger);
+  }
+
+  .btn-danger:hover { background: #e05c5c18; }
+
+  .btn-icon {
+    padding: 8px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    border-radius: var(--radius-sm);
+  }
+
+  .btn-icon:hover { border-color: var(--accent); color: var(--accent); }
+
+  .error-msg {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 12px;
+    text-align: center;
+  }
+
+  /* ── APP LAYOUT ── */
+  #app-screen { display: none; min-height: 100vh; flex-direction: column; }
+
+  .topbar {
+    height: 56px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .topbar-logo {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--accent);
+    letter-spacing: -0.5px;
+  }
+
+  .topbar-user {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: var(--text-dim);
+  }
+
+  .user-badge {
+    background: var(--accent-dim);
+    color: var(--accent);
+    font-size: 12px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .main-content {
+    flex: 1;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 32px 24px;
+  }
+
+  /* ── TASKS HEADER ── */
+  .tasks-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .tasks-title {
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+    flex: 1;
+  }
+
+  .tasks-count {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+
+  /* ── CREATE TASK ── */
+  .create-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+
+  .create-card-title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 20px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-size: 11px;
+  }
+
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-row-3 {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 16px;
+    justify-content: flex-end;
+  }
+
+  .btn-create {
+    background: var(--accent);
+    color: #fff;
+    padding: 10px 20px;
+  }
+
+  .btn-create:hover { background: var(--accent-hover); }
+
+  /* ── TASK LIST ── */
+  .task-list { display: flex; flex-direction: column; gap: 8px; }
+
+  .task-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    transition: border-color 0.15s;
+    cursor: pointer;
+  }
+
+  .task-card:hover { border-color: var(--accent); }
+
+  .task-card-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .task-title {
+    font-size: 15px;
+    font-weight: 500;
+    flex: 1;
+  }
+
+  .task-title.finished { text-decoration: line-through; color: var(--text-muted); }
+
+  .task-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+
+  .badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 20px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .badge-planned { background: #5c9ce022; color: var(--planned); }
+  .badge-running { background: #e0a45c22; color: var(--running); }
+  .badge-finished { background: #5cc98a22; color: var(--finished); }
+
+  .badge-vh { background: #e05c5c22; color: var(--importance-vh); }
+  .badge-h  { background: #e07a5c22; color: var(--importance-h); }
+  .badge-m  { background: #e0c45c22; color: var(--importance-m); }
+  .badge-l  { background: #7ab8e022; color: var(--importance-l); }
+  .badge-vl { background: #88889922; color: var(--importance-vl); }
+
+  .task-meta {
+    display: flex;
+    gap: 16px;
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .task-description {
+    font-size: 13px;
+    color: var(--text-dim);
+    margin-top: 8px;
+    line-height: 1.6;
+  }
+
+  /* ── TASK DETAIL MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #000000aa;
+    z-index: 200;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .modal-overlay.open { display: flex; }
+
+  .modal {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    width: 100%;
+    max-width: 560px;
+    max-height: 90vh;
+    overflow-y: auto;
+    padding: 28px;
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  .modal-title {
+    font-size: 18px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border);
+  }
+
+  /* ── EMPTY STATE ── */
+  .empty-state {
+    text-align: center;
+    padding: 60px 24px;
+    color: var(--text-muted);
+  }
+
+  .empty-icon {
+    font-size: 40px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+  }
+
+  .empty-title {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text-dim);
+    margin-bottom: 6px;
+  }
+
+  .empty-sub { font-size: 13px; }
+
+  /* ── PAGINATION ── */
+  .pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 24px;
+  }
+
+  .page-info {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--text-dim);
+    padding: 0 12px;
+  }
+
+  /* ── LOADING ── */
+  .spinner {
+    width: 20px; height: 20px;
+    border: 2px solid var(--border);
+    border-top-color: var(--accent);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: inline-block;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .loading-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  /* ── TOAST ── */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 999;
+  }
+
+  .toast {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 12px 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    animation: slideIn 0.2s ease;
+    min-width: 220px;
+  }
+
+  .toast.success { border-color: var(--success); }
+  .toast.error { border-color: var(--danger); }
+
+  @keyframes slideIn {
+    from { transform: translateX(20px); opacity: 0; }
+    to   { transform: translateX(0);    opacity: 1; }
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  .detail-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 14px;
+  }
+
+  .detail-label {
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    min-width: 120px;
+    padding-top: 2px;
+  }
+
+  .detail-value { color: var(--text); }
+
+  /* Edit mode in modal */
+  .edit-mode .view-mode { display: none; }
+  .edit-mode .edit-field { display: block !important; }
+  .edit-field { display: none; }
+
+  @media (max-width: 600px) {
+    .form-row, .form-row-3 { grid-template-columns: 1fr; }
+    .tasks-header { flex-wrap: wrap; }
+    .main-content { padding: 16px; }
+    .topbar { padding: 0 16px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- AUTH -->
+<div id="auth-screen">
+  <div class="auth-card">
+    <div class="auth-logo">task_manager</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchTab('login')">Войти</button>
+      <button class="auth-tab" onclick="switchTab('register')">Регистрация</button>
+    </div>
+
+    <div id="login-form">
+      <div class="form-group">
+        <label class="form-label">Логин</label>
+        <input class="form-input" id="login-username" type="text" placeholder="username" autocomplete="username">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input class="form-input" id="login-password" type="password" placeholder="••••••" autocomplete="current-password">
+      </div>
+      <button class="btn btn-primary" onclick="doLogin()">Войти</button>
+      <div class="error-msg" id="login-error"></div>
+    </div>
+
+    <div id="register-form" style="display:none">
+      <div class="form-group">
+        <label class="form-label">Логин</label>
+        <input class="form-input" id="reg-username" type="text" placeholder="username (минимум 6 символов)">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Пароль</label>
+        <input class="form-input" id="reg-password" type="password" placeholder="••••••">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Подтвердите пароль</label>
+        <input class="form-input" id="reg-confirm" type="password" placeholder="••••••">
+      </div>
+      <button class="btn btn-primary" onclick="doRegister()">Создать аккаунт</button>
+      <div class="error-msg" id="reg-error"></div>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app-screen">
+  <div class="topbar">
+    <span class="topbar-logo">task_manager</span>
+    <div class="topbar-user">
+      <span class="user-badge" id="user-badge">—</span>
+      <button class="btn btn-ghost" style="padding:7px 14px;font-size:13px" onclick="doLogout()">Выйти</button>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <!-- Create Task -->
+    <div class="create-card">
+      <div class="create-card-title">Новая задача</div>
+      <div class="form-row">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Название *</label>
+          <input class="form-input" id="new-title" type="text" placeholder="Что нужно сделать?">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Важность *</label>
+          <select class="form-input" id="new-importance">
+            <option value="VERY_HIGH">🔴 Очень высокая</option>
+            <option value="HIGH">🟠 Высокая</option>
+            <option value="MEDIUM" selected>🟡 Средняя</option>
+            <option value="LOW">🔵 Низкая</option>
+            <option value="VERY_LOW">⚪ Очень низкая</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label class="form-label">Описание</label>
+        <input class="form-input" id="new-description" type="text" placeholder="Подробности (необязательно)">
+      </div>
+      <div class="form-row" style="margin-top:12px">
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Срок выполнения *</label>
+          <input class="form-input" id="new-deadline" type="datetime-local">
+        </div>
+        <div class="form-group" style="margin:0">
+          <label class="form-label">Время на выполнение (мин)</label>
+          <input class="form-input" id="new-duration" type="number" placeholder="напр. 60" min="1">
+        </div>
+      </div>
+      <div class="form-actions">
+        <button class="btn btn-create" onclick="createTask()">Создать задачу</button>
+      </div>
+    </div>
+
+    <!-- Tasks List -->
+    <div class="tasks-header">
+      <div class="tasks-title">Мои задачи</div>
+      <span class="tasks-count" id="tasks-count"></span>
+    </div>
+
+    <div id="tasks-container">
+      <div class="loading-center"><div class="spinner"></div></div>
+    </div>
+
+    <div class="pagination" id="pagination" style="display:none">
+      <button class="btn btn-icon" id="prev-btn" onclick="changePage(-1)">←</button>
+      <span class="page-info" id="page-info">стр. 1</span>
+      <button class="btn btn-icon" id="next-btn" onclick="changePage(1)">→</button>
+    </div>
+  </div>
+</div>
+
+<!-- Task Detail Modal -->
+<div class="modal-overlay" id="task-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modal-title-view"></div>
+      <div class="task-badges" id="modal-badges"></div>
+    </div>
+
+    <div id="modal-body">
+      <div class="view-mode" id="modal-view">
+        <div id="modal-description" style="color:var(--text-dim);font-size:14px;margin-bottom:16px"></div>
+        <div class="divider"></div>
+        <div id="modal-details"></div>
+      </div>
+
+      <div class="edit-field" id="modal-edit" style="display:none">
+        <div class="form-group">
+          <label class="form-label">Название</label>
+          <input class="form-input" id="edit-title">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Описание</label>
+          <input class="form-input" id="edit-description">
+        </div>
+        <div class="form-row">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Срок</label>
+            <input class="form-input" id="edit-deadline" type="datetime-local">
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Время (мин)</label>
+            <input class="form-input" id="edit-duration" type="number" min="1">
+          </div>
+        </div>
+        <div class="form-row" style="margin-top:12px">
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Важность</label>
+            <select class="form-input" id="edit-importance">
+              <option value="VERY_HIGH">🔴 Очень высокая</option>
+              <option value="HIGH">🟠 Высокая</option>
+              <option value="MEDIUM">🟡 Средняя</option>
+              <option value="LOW">🔵 Низкая</option>
+              <option value="VERY_LOW">⚪ Очень низкая</option>
+            </select>
+          </div>
+          <div class="form-group" style="margin:0">
+            <label class="form-label">Статус</label>
+            <select class="form-input" id="edit-status">
+              <option value="PLANNED">Запланирована</option>
+              <option value="RUNNING">В процессе</option>
+              <option value="FINISHED">Выполнена</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal()">Закрыть</button>
+      <div style="flex:1"></div>
+      <button class="btn btn-danger" id="modal-delete-btn" onclick="deleteCurrentTask()">Удалить</button>
+      <button class="btn btn-ghost" id="modal-complete-btn" onclick="completeCurrentTask()">✓ Завершить</button>
+      <button class="btn btn-ghost" id="modal-edit-toggle" onclick="toggleEditMode()">Редактировать</button>
+      <button class="btn btn-create" id="modal-save-btn" onclick="saveEdit()" style="display:none">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toasts"></div>
+
+<script>
+const API = '';
+let currentUser = null;
+let tasks = [];
+let currentPage = 0;
+let pageSize = 8;
+let hasMore = false;
+let currentTaskId = null;
+let editMode = false;
+
+// ── API HELPERS ──
+async function api(method, path, body) {
+  const opts = {
+    method,
+    credentials: 'include',
+    headers: { 'Content-Type': 'application/json' }
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  if (r.status === 204 || r.headers.get('content-length') === '0') return null;
+  const data = await r.json().catch(() => null);
+  if (!r.ok) throw new Error(data?.message || data?.exceptionMessage || 'Ошибка');
+  return data;
+}
+
+// ── TOAST ──
+function toast(msg, type = 'success') {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  el.innerHTML = `<span>${type === 'success' ? '✓' : '✕'}</span> ${msg}`;
+  document.getElementById('toasts').appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ── AUTH ──
+function switchTab(tab) {
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
+  document.querySelectorAll('.auth-tab').forEach((t, i) =>
+    t.classList.toggle('active', (i === 0) === (tab === 'login')));
+}
+
+async function doLogin() {
+  const username = document.getElementById('login-username').value.trim();
+  const password = document.getElementById('login-password').value;
+  document.getElementById('login-error').textContent = '';
+  try {
+    await api('POST', '/api/auth', { username, password });
+    await loadCurrentUser();
+    showApp();
+  } catch(e) {
+    document.getElementById('login-error').textContent = e.message;
+  }
+}
+
+async function doRegister() {
+  const username = document.getElementById('reg-username').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirmPassword = document.getElementById('reg-confirm').value;
+  document.getElementById('reg-error').textContent = '';
+  try {
+    await api('POST', '/api/auth/register', { username, password, confirmPassword });
+    toast('Аккаунт создан! Войдите.');
+    switchTab('login');
+    document.getElementById('login-username').value = username;
+  } catch(e) {
+    document.getElementById('reg-error').textContent = e.message;
+  }
+}
+
+async function doLogout() {
+  try { await api('DELETE', '/api/auth'); } catch {}
+  currentUser = null;
+  showAuth();
+}
+
+// ── ROUTING ──
+function showApp() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'flex';
+  document.getElementById('user-badge').textContent = currentUser?.username || '—';
+  loadTasks();
+}
+
+function showAuth() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+}
+
+async function loadCurrentUser() {
+  currentUser = await api('GET', '/api/user/me');
+}
+
+// ── TASKS ──
+async function loadTasks() {
+  document.getElementById('tasks-container').innerHTML =
+    '<div class="loading-center"><div class="spinner"></div></div>';
+
+  try {
+    const result = await api('GET', `/api/task?pageNum=${currentPage}&pageSize=${pageSize + 1}`);
+    hasMore = result.length > pageSize;
+    tasks = hasMore ? result.slice(0, pageSize) : result;
+    renderTasks();
+    renderPagination();
+  } catch(e) {
+    document.getElementById('tasks-container').innerHTML =
+      `<div class="empty-state"><div class="empty-icon">⚠</div><div class="empty-title">${e.message}</div></div>`;
+  }
+}
+
+function renderTasks() {
+  const c = document.getElementById('tasks-container');
+  document.getElementById('tasks-count').textContent = tasks.length ? `${tasks.length} задач` : '';
+
+  if (!tasks.length) {
+    c.innerHTML = `<div class="empty-state">
+      <div class="empty-icon">📋</div>
+      <div class="empty-title">Задач пока нет</div>
+      <div class="empty-sub">Создайте первую задачу выше</div>
+    </div>`;
+    return;
+  }
+
+  c.innerHTML = `<div class="task-list">${tasks.map(taskCard).join('')}</div>`;
+}
+
+function taskCard(t) {
+  const statusClass = t.status.toLowerCase();
+  const statusLabel = { PLANNED: 'Запланирована', RUNNING: 'В процессе', FINISHED: 'Выполнена' }[t.status];
+  const importanceBadge = importanceBadgeHtml(t.importance);
+  const titleClass = t.status === 'FINISHED' ? 'finished' : '';
+  const deadline = t.dateTimeWhenYouNeedToComplete
+    ? new Date(t.dateTimeWhenYouNeedToComplete).toLocaleString('ru', { day:'2-digit', month:'short', hour:'2-digit', minute:'2-digit' })
+    : '—';
+
+  return `<div class="task-card" onclick="openTask(${t.id})">
+    <div class="task-card-header">
+      <div class="task-title ${titleClass}">${escape(t.title)}</div>
+      <div class="task-badges">
+        <span class="badge badge-${statusClass}">${statusLabel}</span>
+        ${importanceBadge}
+      </div>
+    </div>
+    ${t.description ? `<div class="task-description">${escape(t.description)}</div>` : ''}
+    <div class="task-meta">
+      <span>⏰ ${deadline}</span>
+      ${t.timeToCompleteInMinutes ? `<span>🕐 ${formatMinutes(t.timeToCompleteInMinutes)}</span>` : ''}
+    </div>
+  </div>`;
+}
+
+function importanceBadgeHtml(imp) {
+  const map = {
+    VERY_HIGH: ['vh', '🔴 Очень высокая'],
+    HIGH:      ['h',  '🟠 Высокая'],
+    MEDIUM:    ['m',  '🟡 Средняя'],
+    LOW:       ['l',  '🔵 Низкая'],
+    VERY_LOW:  ['vl', '⚪ Очень низкая']
+  };
+  const [cls, label] = map[imp] || ['vl', imp];
+  return `<span class="badge badge-${cls}">${label}</span>`;
+}
+
+function formatMinutes(m) {
+  if (m < 60) return `${m} мин`;
+  const h = Math.floor(m / 60), min = m % 60;
+  return min ? `${h}ч ${min}м` : `${h}ч`;
+}
+
+function escape(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ── PAGINATION ──
+function renderPagination() {
+  const p = document.getElementById('pagination');
+  if (currentPage === 0 && !hasMore) { p.style.display = 'none'; return; }
+  p.style.display = 'flex';
+  document.getElementById('page-info').textContent = `стр. ${currentPage + 1}`;
+  document.getElementById('prev-btn').disabled = currentPage === 0;
+  document.getElementById('next-btn').disabled = !hasMore;
+}
+
+function changePage(delta) {
+  currentPage = Math.max(0, currentPage + delta);
+  loadTasks();
+}
+
+// ── CREATE TASK ──
+async function createTask() {
+  const title = document.getElementById('new-title').value.trim();
+  const description = document.getElementById('new-description').value.trim() || null;
+  const importance = document.getElementById('new-importance').value;
+  const deadline = document.getElementById('new-deadline').value;
+  const duration = document.getElementById('new-duration').value;
+
+  if (!title) { toast('Введите название задачи', 'error'); return; }
+  if (!deadline) { toast('Укажите срок выполнения', 'error'); return; }
+
+  try {
+    await api('POST', '/api/task', {
+      title,
+      description,
+      importance,
+      dateTimeWhenYouNeedToComplete: deadline,
+      timeToCompleteInMinutes: duration ? parseInt(duration) : null
+    });
+    toast('Задача создана');
+    document.getElementById('new-title').value = '';
+    document.getElementById('new-description').value = '';
+    document.getElementById('new-deadline').value = '';
+    document.getElementById('new-duration').value = '';
+    currentPage = 0;
+    loadTasks();
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+// ── TASK MODAL ──
+function openTask(id) {
+  const task = tasks.find(t => t.id === id);
+  if (!task) return;
+  currentTaskId = id;
+  editMode = false;
+
+  document.getElementById('modal-title-view').textContent = task.title;
+  document.getElementById('modal-badges').innerHTML =
+    `<span class="badge badge-${task.status.toLowerCase()}">${{PLANNED:'Запланирована',RUNNING:'В процессе',FINISHED:'Выполнена'}[task.status]}</span>
+     ${importanceBadgeHtml(task.importance)}`;
+
+  document.getElementById('modal-description').textContent = task.description || '';
+  document.getElementById('modal-description').style.display = task.description ? 'block' : 'none';
+
+  const deadline = task.dateTimeWhenYouNeedToComplete
+    ? new Date(task.dateTimeWhenYouNeedToComplete).toLocaleString('ru')
+    : '—';
+
+  document.getElementById('modal-details').innerHTML = `
+    <div class="detail-row"><span class="detail-label">Срок</span><span class="detail-value">${deadline}</span></div>
+    <div class="detail-row"><span class="detail-label">Время</span><span class="detail-value">${task.timeToCompleteInMinutes ? formatMinutes(task.timeToCompleteInMinutes) : '—'}</span></div>
+    <div class="detail-row"><span class="detail-label">Создана</span><span class="detail-value">${new Date(task.createdAt).toLocaleString('ru')}</span></div>
+    <div class="detail-row"><span class="detail-label">Обновлена</span><span class="detail-value">${new Date(task.updatedAt).toLocaleString('ru')}</span></div>
+  `;
+
+  // show/hide complete button
+  document.getElementById('modal-complete-btn').style.display =
+    task.status !== 'FINISHED' ? 'inline-flex' : 'none';
+
+  document.getElementById('modal-view').style.display = 'block';
+  document.getElementById('modal-edit').style.display = 'none';
+  document.getElementById('modal-edit-toggle').style.display = 'inline-flex';
+  document.getElementById('modal-save-btn').style.display = 'none';
+
+  document.getElementById('task-modal').classList.add('open');
+}
+
+function closeModal() {
+  document.getElementById('task-modal').classList.remove('open');
+  currentTaskId = null;
+}
+
+function toggleEditMode() {
+  const task = tasks.find(t => t.id === currentTaskId);
+  if (!task) return;
+  editMode = true;
+
+  // Populate edit fields
+  document.getElementById('edit-title').value = task.title;
+  document.getElementById('edit-description').value = task.description || '';
+  document.getElementById('edit-deadline').value = task.dateTimeWhenYouNeedToComplete
+    ? task.dateTimeWhenYouNeedToComplete.slice(0, 16) : '';
+  document.getElementById('edit-duration').value = task.timeToCompleteInMinutes || '';
+  document.getElementById('edit-importance').value = task.importance;
+  document.getElementById('edit-status').value = task.status;
+
+  document.getElementById('modal-view').style.display = 'none';
+  document.getElementById('modal-edit').style.display = 'block';
+  document.getElementById('modal-edit-toggle').style.display = 'none';
+  document.getElementById('modal-save-btn').style.display = 'inline-flex';
+  document.getElementById('modal-complete-btn').style.display = 'none';
+}
+
+async function saveEdit() {
+  const body = {
+    title: document.getElementById('edit-title').value.trim() || null,
+    description: document.getElementById('edit-description').value.trim() || null,
+    dateTimeWhenYouNeedToComplete: document.getElementById('edit-deadline').value || null,
+    timeToCompleteInMinutes: document.getElementById('edit-duration').value
+      ? parseInt(document.getElementById('edit-duration').value) : null,
+    importance: document.getElementById('edit-importance').value,
+    status: document.getElementById('edit-status').value
+  };
+
+  try {
+    await api('PATCH', `/api/task/${currentTaskId}`, body);
+    toast('Задача обновлена');
+    closeModal();
+    loadTasks();
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function completeCurrentTask() {
+  try {
+    await api('PATCH', `/api/task/complete/${currentTaskId}`);
+    toast('Задача завершена ✓');
+    closeModal();
+    loadTasks();
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+async function deleteCurrentTask() {
+  if (!confirm('Удалить задачу?')) return;
+  try {
+    await api('DELETE', `/api/task/${currentTaskId}`);
+    toast('Задача удалена');
+    closeModal();
+    loadTasks();
+  } catch(e) {
+    toast(e.message, 'error');
+  }
+}
+
+// Close modal on overlay click
+document.getElementById('task-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Enter key on auth
+document.addEventListener('keydown', e => {
+  if (e.key === 'Enter') {
+    if (document.getElementById('login-form').style.display !== 'none' &&
+        document.getElementById('auth-screen').style.display !== 'none') doLogin();
+  }
+});
+
+// ── INIT ──
+(async () => {
+  try {
+    await loadCurrentUser();
+    if (currentUser) showApp();
+    else showAuth();
+  } catch {
+    showAuth();
+  }
+})();
+</script>
+</body>
+</html>
