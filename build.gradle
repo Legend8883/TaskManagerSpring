@@ -18,6 +18,10 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    mockitoAgent
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -40,8 +44,19 @@ dependencies {
     annotationProcessor 'org.mapstruct:mapstruct-processor:1.6.3'
 
     implementation("org.projectlombok:lombok-mapstruct-binding:0.2.0")
+
+    testImplementation "org.mockito:mockito-core:5.17.0"
+    mockitoAgent ("org.mockito:mockito-core:5.17.0") {
+        transitive = false
+    }
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks {
+    test {
+        jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+    }
 }
