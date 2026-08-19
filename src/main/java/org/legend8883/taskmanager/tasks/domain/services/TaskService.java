@@ -10,6 +10,7 @@ import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
 import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
 import org.legend8883.taskmanager.tasks.db.enums.Status;
 import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
+import org.legend8883.taskmanager.tasks.domain.exceptions.TaskErrorMessages;
 import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
 import org.legend8883.taskmanager.tasks.domain.services.managers.ChangeTaskManager;
 import org.legend8883.taskmanager.tasks.domain.services.managers.CreateTaskManager;
@@ -38,7 +39,7 @@ public class TaskService {
 
     public TaskResponse getTaskById(Long id) {
         TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(TaskErrorMessages.taskNotFound(id)));
 
         return taskMapper.entityToResponse(taskEntity);
     }
@@ -58,7 +59,7 @@ public class TaskService {
             ChangeTaskRequest request
     ) {
         TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(TaskErrorMessages.taskNotFound(id)));
 
         TaskEntity changedTaskEntity = changeTaskManager.getChangedTaskEntity(taskEntity, request);
 
@@ -69,7 +70,7 @@ public class TaskService {
 
     public TaskResponse completeTask(Long id) {
         TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found"));
+                .orElseThrow(() -> new EntityNotFoundException(TaskErrorMessages.taskNotFound(id)));
 
         taskEntity.setStatus(Status.FINISHED);
 
