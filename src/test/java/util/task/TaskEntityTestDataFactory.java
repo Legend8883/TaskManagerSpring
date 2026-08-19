@@ -11,8 +11,6 @@ import static util.task.TaskTestFields.*;
 
 @UtilityClass
 public final class TaskEntityTestDataFactory {
-
-
     public static TaskEntity buildTaskEntity() {
         return TaskEntity.builder()
                 .id(TASK_ID)
@@ -35,6 +33,17 @@ public final class TaskEntityTestDataFactory {
                 .timeToCompleteInMinutes(TASK_TIME_TO_COMPLETE_IN_MINUTES)
                 .importance(TASK_IMPORTANCE)
                 .status(TASK_STATUS)
+                .build();
+    }
+
+    public static TaskEntity buildTaskEntityForResponse() {
+        return TaskEntity.builder()
+                .user(TASK_USER)
+                .title(TASK_TITLE)
+                .description(TASK_DESCRIPTION)
+                .dateTimeWhenYouNeedToComplete(TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE)
+                .timeToCompleteInMinutes(TASK_TIME_TO_COMPLETE_IN_MINUTES)
+                .importance(TASK_IMPORTANCE)
                 .build();
     }
 

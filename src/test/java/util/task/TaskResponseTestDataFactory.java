@@ -1,0 +1,25 @@
+package util.task;
+
+import lombok.experimental.UtilityClass;
+import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
+import util.user.UserTestDataFactory;
+
+import static util.task.TaskTestFields.*;
+
+@UtilityClass
+public final class TaskResponseTestDataFactory {
+    public static TaskResponse buildTaskResponse() {
+        return new TaskResponse(
+                TASK_ID,
+                UserTestDataFactory.buildSimpleUserResponse(),
+                TASK_TITLE,
+                TASK_DESCRIPTION,
+                TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE,
+                TASK_TIME_TO_COMPLETE_IN_MINUTES,
+                TASK_IMPORTANCE,
+                TASK_STATUS,
+                TASK_CREATED_AT,
+                TASK_UPDATED_AT
+        );
+    }
+}

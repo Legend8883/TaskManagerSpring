@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.services;
+package unit.org.legend8883.taskmanager.tasks.domain.services.managers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.legend8883.taskmanager.tasks.api.dto.requests.ChangeTaskRequest;
 import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
-import org.legend8883.taskmanager.tasks.domain.services.ChangeTaskManager;
+import org.legend8883.taskmanager.tasks.domain.services.managers.ChangeTaskManager;
 import util.task.ChangeTaskRequestTestDataFactory;
 import util.task.TaskEntityTestDataFactory;
 

@@ -1,4 +1,4 @@
-package org.legend8883.taskmanager.tasks.domain.services;
+package org.legend8883.taskmanager.tasks.domain.services.managers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

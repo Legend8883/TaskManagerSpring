@@ -11,6 +11,7 @@ import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
 import org.legend8883.taskmanager.tasks.db.enums.Status;
 import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
 import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
+import org.legend8883.taskmanager.tasks.domain.services.managers.ChangeTaskManager;
 import org.legend8883.taskmanager.users.db.entities.UserEntity;
 import org.legend8883.taskmanager.users.domain.services.UserManager;
 import org.springframework.data.domain.Pageable;

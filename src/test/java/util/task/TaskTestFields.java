@@ -23,6 +23,18 @@ public final class TaskTestFields {
     public static final Integer TASK_TIME_TO_COMPLETE_IN_MINUTES = 42;
     public static final Importance TASK_IMPORTANCE = Importance.HIGH;
     public static final Status TASK_STATUS = Status.PLANNED;
+    public static final LocalDateTime TASK_CREATED_AT = LocalDateTime.of(
+            2026,
+            8,
+            15,
+            20,
+            0);
+    public static final LocalDateTime TASK_UPDATED_AT = LocalDateTime.of(
+            2026,
+            8,
+            15,
+            20,
+            0);
 
     public static final String DIFFERENT_TASK_TITLE = "DifTestTitle";
     public static final String DIFFERENT_TASK_DESCRIPTION = "DifTestDescription";
