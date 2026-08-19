@@ -12,6 +12,7 @@ import org.legend8883.taskmanager.tasks.db.enums.Status;
 import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
 import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
 import org.legend8883.taskmanager.tasks.domain.services.managers.ChangeTaskManager;
+import org.legend8883.taskmanager.tasks.domain.services.managers.CreateTaskManager;
 import org.legend8883.taskmanager.users.db.entities.UserEntity;
 import org.legend8883.taskmanager.users.domain.services.UserManager;
 import org.springframework.data.domain.Pageable;
@@ -27,23 +28,12 @@ public class TaskService {
     private final UserManager userManager;
     private final TaskMapper taskMapper;
     private final PageableCreator pageableCreator;
+
+    private final CreateTaskManager createTaskManager;
     private final ChangeTaskManager changeTaskManager;
 
     public TaskResponse createNewTask(CreateTaskRequest request) {
-        UserEntity currentUser = userManager.getCurrentUser();
-
-        TaskEntity newTask = TaskEntity.builder()
-                .user(currentUser)
-                .title(request.title())
-                .description(request.description())
-                .dateTimeWhenYouNeedToComplete(request.dateTimeWhenYouNeedToComplete())
-                .timeToCompleteInMinutes(request.timeToCompleteInMinutes())
-                .importance(request.importance())
-                .build();
-
-        taskRepository.save(newTask);
-        log.info("Created new task with id {}", newTask.getId());
-        return taskMapper.entityToResponse(newTask);
+        return createTaskManager.create(request);
     }
 
     public TaskResponse getTaskById(Long id) {
