@@ -11,10 +11,7 @@ import org.legend8883.taskmanager.tasks.db.enums.Status;
 import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
 import org.legend8883.taskmanager.tasks.domain.exceptions.TaskErrorMessages;
 import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
-import org.legend8883.taskmanager.tasks.domain.services.managers.ChangeTaskManager;
-import org.legend8883.taskmanager.tasks.domain.services.managers.CreateTaskManager;
-import org.legend8883.taskmanager.tasks.domain.services.managers.GetAllUserTasksManager;
-import org.legend8883.taskmanager.tasks.domain.services.managers.GetTaskByIdManager;
+import org.legend8883.taskmanager.tasks.domain.services.managers.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -24,12 +21,13 @@ import java.util.List;
 @Slf4j
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final TaskMapper taskMapper;
 
     private final CreateTaskManager createTaskManager;
     private final GetTaskByIdManager getTaskByIdManager;
     private final GetAllUserTasksManager getAllUserTasksManager;
     private final ChangeTaskManager changeTaskManager;
+    private final CompleteTaskManager completeTaskManager;
+    private final DeleteTaskByIdManager deleteTaskByIdManager;
 
     public TaskResponse createNewTask(CreateTaskRequest request) {
         return createTaskManager.create(request);
@@ -51,18 +49,10 @@ public class TaskService {
     }
 
     public TaskResponse completeTask(Long id) {
-        TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException(TaskErrorMessages.taskNotFound(id)));
-
-        taskEntity.setStatus(Status.FINISHED);
-
-        TaskEntity savedTask = taskRepository.save(taskEntity);
-        log.info("Completed task with id {} ", savedTask.getId());
-        return taskMapper.entityToResponse(savedTask);
+        return completeTaskManager.complete(id);
     }
 
     public void deleteTaskById(Long id) {
-        taskRepository.deleteById(id);
-        log.info("Deleted task with id {}", id);
+        deleteTaskByIdManager.delete(id);
     }
 }
