@@ -22,4 +22,19 @@ public final class TaskResponseTestDataFactory {
                 TASK_UPDATED_AT
         );
     }
+
+    public static TaskResponse buildDifferentTaskResponse() {
+        return new TaskResponse(
+                DIFFERENT_TASK_ID,
+                UserTestDataFactory.buildSimpleUserResponse(),
+                DIFFERENT_TASK_TITLE,
+                DIFFERENT_TASK_DESCRIPTION,
+                DIFFERENT_TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE,
+                DIFFERENT_TASK_TIME_TO_COMPLETE_IN_MINUTES,
+                DIFFERENT_TASK_IMPORTANCE,
+                DIFFERENT_TASK_STATUS,
+                TASK_CREATED_AT,
+                TASK_UPDATED_AT
+        );
+    }
 }

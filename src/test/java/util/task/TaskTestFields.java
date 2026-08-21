@@ -36,6 +36,7 @@ public final class TaskTestFields {
             20,
             0);
 
+    public static final Long DIFFERENT_TASK_ID = 676L;
     public static final String DIFFERENT_TASK_TITLE = "DifTestTitle";
     public static final String DIFFERENT_TASK_DESCRIPTION = "DifTestDescription";
     public static final LocalDateTime DIFFERENT_TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE = LocalDateTime.of(

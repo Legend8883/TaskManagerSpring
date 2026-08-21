@@ -36,7 +36,7 @@ public final class TaskEntityTestDataFactory {
                 .build();
     }
 
-    public static TaskEntity buildTaskEntityForResponse() {
+    public static TaskEntity buildTaskEntityForCaptor() {
         return TaskEntity.builder()
                 .user(TASK_USER)
                 .title(TASK_TITLE)
@@ -48,6 +48,19 @@ public final class TaskEntityTestDataFactory {
     }
 
     public static TaskEntity buildDifferentTaskEntity() {
+        return TaskEntity.builder()
+                .id(DIFFERENT_TASK_ID)
+                .user(TASK_USER)
+                .title(DIFFERENT_TASK_TITLE)
+                .description(DIFFERENT_TASK_DESCRIPTION)
+                .dateTimeWhenYouNeedToComplete(DIFFERENT_TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE)
+                .timeToCompleteInMinutes(DIFFERENT_TASK_TIME_TO_COMPLETE_IN_MINUTES)
+                .importance(DIFFERENT_TASK_IMPORTANCE)
+                .status(DIFFERENT_TASK_STATUS)
+                .build();
+    }
+
+    public static TaskEntity buildDifferentTaskEntityWithSameId() {
         return TaskEntity.builder()
                 .id(TASK_ID)
                 .user(TASK_USER)

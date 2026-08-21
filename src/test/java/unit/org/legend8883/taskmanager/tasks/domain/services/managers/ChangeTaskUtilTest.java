@@ -7,7 +7,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.legend8883.taskmanager.tasks.api.dto.requests.ChangeTaskRequest;
 import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
-import org.legend8883.taskmanager.tasks.domain.services.managers.ChangeTaskManager;
+import org.legend8883.taskmanager.tasks.domain.util.ChangeTaskUtil;
 import util.task.ChangeTaskRequestTestDataFactory;
 import util.task.TaskEntityTestDataFactory;
 
@@ -16,12 +16,12 @@ import java.util.stream.Stream;
 import static org.assertj.core.api.Assertions.assertThat;
 import static util.task.TaskTestFields.*;
 
-class ChangeTaskManagerTest {
-    private ChangeTaskManager changeTaskManager;
+class ChangeTaskUtilTest {
+    private ChangeTaskUtil changeTaskUtil;
 
     @BeforeEach
     void setUp() {
-        changeTaskManager = new ChangeTaskManager();
+        changeTaskUtil = new ChangeTaskUtil();
     }
 
     @Test
@@ -38,7 +38,7 @@ class ChangeTaskManagerTest {
         );
 
 
-        TaskEntity actualTaskEntity = changeTaskManager.getChangedTaskEntity(originalTaskEntity, changeTaskRequest);
+        TaskEntity actualTaskEntity = changeTaskUtil.getChangedTaskEntity(originalTaskEntity, changeTaskRequest);
 
 
         assertThat(actualTaskEntity)
@@ -55,7 +55,7 @@ class ChangeTaskManagerTest {
         TaskEntity originTaskEntity = TaskEntityTestDataFactory.buildTaskEntity();
 
 
-        TaskEntity actualTaskEntity = changeTaskManager.getChangedTaskEntity(originTaskEntity, changeTaskRequest);
+        TaskEntity actualTaskEntity = changeTaskUtil.getChangedTaskEntity(originTaskEntity, changeTaskRequest);
 
 
         assertThat(actualTaskEntity)
@@ -66,11 +66,11 @@ class ChangeTaskManagerTest {
     @Test
     void getChangedTaskEntityTest_shouldReturnChangedTaskEntity_whenAllFieldsNotNull() {
         TaskEntity originalTaskEntity = TaskEntityTestDataFactory.buildTaskEntity();
-        TaskEntity expectedTaskEntity = TaskEntityTestDataFactory.buildDifferentTaskEntity();
+        TaskEntity expectedTaskEntity = TaskEntityTestDataFactory.buildDifferentTaskEntityWithSameId();
         ChangeTaskRequest difChangedTaskRequest = ChangeTaskRequestTestDataFactory.buildDifferentChangeTaskRequest();
 
 
-        TaskEntity actualTaskEntity = changeTaskManager.getChangedTaskEntity(originalTaskEntity, difChangedTaskRequest);
+        TaskEntity actualTaskEntity = changeTaskUtil.getChangedTaskEntity(originalTaskEntity, difChangedTaskRequest);
 
 
         assertThat(actualTaskEntity)

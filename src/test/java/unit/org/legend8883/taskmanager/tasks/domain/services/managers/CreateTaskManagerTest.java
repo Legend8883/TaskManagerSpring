@@ -9,7 +9,7 @@ import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
 import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
 import org.legend8883.taskmanager.tasks.domain.services.managers.CreateTaskManager;
 import org.legend8883.taskmanager.users.db.entities.UserEntity;
-import org.legend8883.taskmanager.users.domain.services.UserManager;
+import org.legend8883.taskmanager.users.domain.util.UserUtil;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -17,7 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import util.task.CreateTaskRequestTestDataFactory;
 import util.task.TaskEntityTestDataFactory;
 import util.task.TaskResponseTestDataFactory;
-import util.user.UserTestDataFactory;
+import util.task.TaskTestFields;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
@@ -27,7 +27,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class CreateTaskManagerTest {
     @Mock
-    private UserManager userManager;
+    private UserUtil userUtil;
 
     @Mock
     private TaskRepository taskRepository;
@@ -41,13 +41,13 @@ class CreateTaskManagerTest {
     @Test
     void createTest_shouldReturnCorrectResponse_whenTaskSaved() {
         CreateTaskRequest request = CreateTaskRequestTestDataFactory.buildCreateTaskRequest();
-        UserEntity currentUser = UserTestDataFactory.buildUserEntity();
+        UserEntity currentUser = TaskTestFields.TASK_USER;
         TaskEntity taskEntity = TaskEntityTestDataFactory.buildTaskEntity();
-        TaskEntity expectedTaskEntity = TaskEntityTestDataFactory.buildTaskEntityForResponse();
+        TaskEntity expectedTaskEntity = TaskEntityTestDataFactory.buildTaskEntityForCaptor();
         TaskResponse expectedResponse = TaskResponseTestDataFactory.buildTaskResponse();
         ArgumentCaptor<TaskEntity> captor = ArgumentCaptor.forClass(TaskEntity.class);
 
-        when(userManager.getCurrentUser())
+        when(userUtil.getCurrentUser())
                 .thenReturn(currentUser);
         when(taskRepository.save(any(TaskEntity.class)))
                 .thenReturn(taskEntity);

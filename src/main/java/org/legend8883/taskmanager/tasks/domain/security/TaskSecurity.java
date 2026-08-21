@@ -1,4 +1,4 @@
-package org.legend8883.taskmanager.tasks.domain.services;
+package org.legend8883.taskmanager.tasks.domain.security;
 
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
