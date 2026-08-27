@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.services.managers;
+package org.legend8883.taskmanager.unit.tasks.domain.services.managers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +9,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.mockito.Mockito.verify;
-import static util.task.TaskTestFields.TASK_ID;
+import static org.legend8883.taskmanager.util.task.TaskTestFields.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
 class DeleteTaskByIdManagerTest {

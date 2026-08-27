@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.services.managers;
+package org.legend8883.taskmanager.unit.tasks.domain.services.managers;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -14,15 +14,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import util.task.TaskEntityTestDataFactory;
-import util.task.TaskResponseTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskEntityTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskResponseTestDataFactory;
 
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
-import static util.task.TaskTestFields.TASK_ID;
+import static org.legend8883.taskmanager.util.task.TaskTestFields.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
 class CompleteTaskManagerTest {
@@ -39,6 +39,7 @@ class CompleteTaskManagerTest {
     @Test
     void completeTest_shouldReturnFinishedTask_whenTaskExists() {
         TaskEntity originTaskEntity = TaskEntityTestDataFactory.buildTaskEntity();
+        TaskEntity expectedUnchangedTaskEntity = TaskEntityTestDataFactory.buildTaskEntity();
         TaskEntity finishedTask = TaskEntityTestDataFactory.buildTaskEntityWithStatus(Status.FINISHED);
         TaskResponse expectedResponse = TaskResponseTestDataFactory.buildTaskResponseWithStatus(Status.FINISHED);
         ArgumentCaptor<TaskEntity> captor = ArgumentCaptor.forClass(TaskEntity.class);
@@ -59,9 +60,13 @@ class CompleteTaskManagerTest {
 
         verify(taskRepository).save(captor.capture());
         TaskEntity capturedEntity = captor.getValue();
+        assertThat(capturedEntity.getStatus())
+                .isEqualTo(Status.FINISHED);
+
         assertThat(capturedEntity)
                 .usingRecursiveComparison()
-                .isEqualTo(originTaskEntity);
+                .ignoringFields("status")
+                .isEqualTo(expectedUnchangedTaskEntity);
     }
 
     @Test

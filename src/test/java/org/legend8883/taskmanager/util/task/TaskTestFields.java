@@ -1,10 +1,10 @@
-package util.task;
+package org.legend8883.taskmanager.util.task;
 
 import lombok.experimental.UtilityClass;
 import org.legend8883.taskmanager.tasks.db.enums.Importance;
 import org.legend8883.taskmanager.tasks.db.enums.Status;
 import org.legend8883.taskmanager.users.db.entities.UserEntity;
-import util.user.UserTestDataFactory;
+import org.legend8883.taskmanager.util.user.UserTestDataFactory;
 
 import java.time.LocalDateTime;
 

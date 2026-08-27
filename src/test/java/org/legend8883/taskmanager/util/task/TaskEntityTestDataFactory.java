@@ -1,4 +1,4 @@
-package util.task;
+package org.legend8883.taskmanager.util.task;
 
 import lombok.experimental.UtilityClass;
 import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
@@ -7,7 +7,7 @@ import org.legend8883.taskmanager.tasks.db.enums.Status;
 
 import java.time.LocalDateTime;
 
-import static util.task.TaskTestFields.*;
+import static org.legend8883.taskmanager.util.task.TaskTestFields.*;
 
 @UtilityClass
 public final class TaskEntityTestDataFactory {
@@ -36,6 +36,18 @@ public final class TaskEntityTestDataFactory {
                 .build();
     }
 
+    public static TaskEntity buildTaskEntityWithoutIdWithTitle(String title) {
+        return TaskEntity.builder()
+                .user(TASK_USER)
+                .title(title)
+                .description(TASK_DESCRIPTION)
+                .dateTimeWhenYouNeedToComplete(TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE)
+                .timeToCompleteInMinutes(TASK_TIME_TO_COMPLETE_IN_MINUTES)
+                .importance(TASK_IMPORTANCE)
+                .status(TASK_STATUS)
+                .build();
+    }
+
     public static TaskEntity buildTaskEntityForCaptor() {
         return TaskEntity.builder()
                 .user(TASK_USER)
@@ -50,6 +62,18 @@ public final class TaskEntityTestDataFactory {
     public static TaskEntity buildDifferentTaskEntity() {
         return TaskEntity.builder()
                 .id(DIFFERENT_TASK_ID)
+                .user(TASK_USER)
+                .title(DIFFERENT_TASK_TITLE)
+                .description(DIFFERENT_TASK_DESCRIPTION)
+                .dateTimeWhenYouNeedToComplete(DIFFERENT_TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE)
+                .timeToCompleteInMinutes(DIFFERENT_TASK_TIME_TO_COMPLETE_IN_MINUTES)
+                .importance(DIFFERENT_TASK_IMPORTANCE)
+                .status(DIFFERENT_TASK_STATUS)
+                .build();
+    }
+
+    public static TaskEntity buildDifferentTaskEntityWithoutId() {
+        return TaskEntity.builder()
                 .user(TASK_USER)
                 .title(DIFFERENT_TASK_TITLE)
                 .description(DIFFERENT_TASK_DESCRIPTION)

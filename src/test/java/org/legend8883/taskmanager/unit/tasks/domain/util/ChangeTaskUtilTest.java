@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.util;
+package org.legend8883.taskmanager.unit.tasks.domain.util;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,13 +8,13 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.legend8883.taskmanager.tasks.api.dto.requests.ChangeTaskRequest;
 import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
 import org.legend8883.taskmanager.tasks.domain.util.ChangeTaskUtil;
-import util.task.ChangeTaskRequestTestDataFactory;
-import util.task.TaskEntityTestDataFactory;
+import org.legend8883.taskmanager.util.task.ChangeTaskRequestTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskEntityTestDataFactory;
 
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static util.task.TaskTestFields.*;
+import static org.legend8883.taskmanager.util.task.TaskTestFields.*;
 
 class ChangeTaskUtilTest {
     private ChangeTaskUtil changeTaskUtil;

@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.services.managers;
+package org.legend8883.taskmanager.unit.tasks.domain.services.managers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,10 +14,10 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import util.task.CreateTaskRequestTestDataFactory;
-import util.task.TaskEntityTestDataFactory;
-import util.task.TaskResponseTestDataFactory;
-import util.task.TaskTestFields;
+import org.legend8883.taskmanager.util.task.CreateTaskRequestTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskEntityTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskResponseTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskTestFields;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;

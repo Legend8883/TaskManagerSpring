@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.services.managers;
+package org.legend8883.taskmanager.unit.tasks.domain.services.managers;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -14,9 +14,9 @@ import org.legend8883.taskmanager.tasks.domain.util.ChangeTaskUtil;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import util.task.ChangeTaskRequestTestDataFactory;
-import util.task.TaskEntityTestDataFactory;
-import util.task.TaskResponseTestDataFactory;
+import org.legend8883.taskmanager.util.task.ChangeTaskRequestTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskEntityTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskResponseTestDataFactory;
 
 import java.util.Optional;
 
@@ -26,7 +26,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static util.task.TaskTestFields.TASK_ID;
+import static org.legend8883.taskmanager.util.task.TaskTestFields.TASK_ID;
 
 @ExtendWith(MockitoExtension.class)
 class ChangeTaskManagerTest {

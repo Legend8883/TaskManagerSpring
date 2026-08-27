@@ -1,11 +1,11 @@
-package util.task;
+package org.legend8883.taskmanager.util.task;
 
 import lombok.experimental.UtilityClass;
 import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
 import org.legend8883.taskmanager.tasks.db.enums.Status;
-import util.user.UserTestDataFactory;
+import org.legend8883.taskmanager.util.user.UserTestDataFactory;
 
-import static util.task.TaskTestFields.*;
+import static org.legend8883.taskmanager.util.task.TaskTestFields.*;
 
 @UtilityClass
 public final class TaskResponseTestDataFactory {

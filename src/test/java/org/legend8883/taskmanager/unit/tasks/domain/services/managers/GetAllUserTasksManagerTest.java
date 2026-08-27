@@ -1,4 +1,4 @@
-package unit.org.legend8883.taskmanager.tasks.domain.services.managers;
+package org.legend8883.taskmanager.unit.tasks.domain.services.managers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,9 +13,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Pageable;
-import util.task.TaskEntityTestDataFactory;
-import util.task.TaskResponseTestDataFactory;
-import util.task.TaskTestFields;
+import org.legend8883.taskmanager.util.task.TaskEntityTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskResponseTestDataFactory;
+import org.legend8883.taskmanager.util.task.TaskTestFields;
 
 import java.util.Collections;
 import java.util.List;

@@ -1,16 +1,10 @@
 package org.legend8883.taskmanager.tasks.domain.services;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.legend8883.taskmanager.tasks.api.dto.requests.ChangeTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.requests.CreateTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
-import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
-import org.legend8883.taskmanager.tasks.db.enums.Status;
-import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
-import org.legend8883.taskmanager.tasks.domain.exceptions.TaskErrorMessages;
-import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
 import org.legend8883.taskmanager.tasks.domain.services.managers.*;
 import org.springframework.stereotype.Service;
 
@@ -20,8 +14,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TaskService {
-    private final TaskRepository taskRepository;
-
     private final CreateTaskManager createTaskManager;
     private final GetTaskByIdManager getTaskByIdManager;
     private final GetAllUserTasksManager getAllUserTasksManager;
