@@ -36,6 +36,8 @@ public final class TaskTestFields {
             20,
             0);
 
+
+    public static final UserEntity DIFFERENT_TASK_USER = UserTestDataFactory.buildDifferentUserEntity();
     public static final Long DIFFERENT_TASK_ID = 676L;
     public static final String DIFFERENT_TASK_TITLE = "DifTestTitle";
     public static final String DIFFERENT_TASK_DESCRIPTION = "DifTestDescription";
