@@ -26,10 +26,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 
 import java.time.LocalDateTime;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.legend8883.taskmanager.util.task.TaskTestFields.TASK_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -71,34 +73,32 @@ class TaskControllerIT {
         }
     }
 
-    // Happy path
     @Test
     @WithMockUser
     void createNewTaskIT_shouldReturnCreatedTask_whenRequestIsValid() throws Exception {
         CreateTaskRequest createTaskRequest = CreateTaskRequestTestDataFactory.buildCreateTaskRequest();
         TaskResponse expectedResponse = TaskResponseTestDataFactory.buildTaskResponse();
 
-        isOwnerReturn(true);
         when(taskService.createNewTask(createTaskRequest))
                 .thenReturn(expectedResponse);
 
 
-        mockMvc.perform(post("/api/task")
+        MvcResult result = mockMvc.perform(post("/api/task")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(createTaskRequest))
                 )
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(expectedResponse.id()))
-//                .andExpect(jsonPath("$.user").value(taskResponse.user()))
-                .andExpect(jsonPath("$.title").value(expectedResponse.title()))
-                .andExpect(jsonPath("$.description").value(expectedResponse.description()))
-                .andExpect(jsonPath("$.dateTimeWhenYouNeedToComplete").value(expectedResponse.dateTimeWhenYouNeedToComplete()))
-                .andExpect(jsonPath("$.timeToCompleteInMinutes").value(expectedResponse.timeToCompleteInMinutes()))
-                .andExpect(jsonPath("$.importance").value(expectedResponse.importance()))
-                .andExpect(jsonPath("$.status").value(expectedResponse.status()));
+                .andReturn();
+
+        TaskResponse actualResponse = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                TaskResponse.class
+        );
+
+        assertThat(actualResponse)
+                .isEqualTo(expectedResponse);
     }
 
-    // Not valid
     @ParameterizedTest
     @MethodSource("invalidCreateTaskRequests")
     @WithMockUser
