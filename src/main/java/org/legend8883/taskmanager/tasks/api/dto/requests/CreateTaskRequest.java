@@ -11,11 +11,11 @@ import java.time.LocalDateTime;
 
 public record CreateTaskRequest(
         @NotBlank
-        @Size(min = 1)
+        @Size(min = 3)
         String title,
 
         @Nullable
-        @Size(min = 1)
+        @Size(min = 3)
         String description,
 
         @NotNull
