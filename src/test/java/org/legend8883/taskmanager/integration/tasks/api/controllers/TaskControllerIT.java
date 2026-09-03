@@ -1,14 +1,17 @@
 package org.legend8883.taskmanager.integration.tasks.api.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.legend8883.taskmanager.globalException.GlobalExceptionHandler;
+import org.legend8883.taskmanager.globalException.messages.GlobalErrorMessages;
 import org.legend8883.taskmanager.tasks.api.controllers.TaskController;
 import org.legend8883.taskmanager.tasks.api.dto.requests.CreateTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
+import org.legend8883.taskmanager.tasks.domain.exceptions.TaskErrorMessages;
 import org.legend8883.taskmanager.tasks.domain.services.TaskService;
 import org.legend8883.taskmanager.tasks.domain.util.TaskSecurity;
 import org.legend8883.taskmanager.util.task.CreateTaskRequestTestDataFactory;
@@ -35,8 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.legend8883.taskmanager.util.task.TaskTestFields.TASK_ID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verifyNoInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -51,7 +54,7 @@ class TaskControllerIT {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockitoBean
+    @MockitoBean(name = "taskSecurity")
     private TaskSecurity taskSecurity;
 
     @MockitoBean
@@ -116,9 +119,61 @@ class TaskControllerIT {
         verifyNoInteractions(taskService);
     }
 
-    // Happy path
     @Test
-    void getTaskById() {
+    @WithMockUser
+    void getTaskByIdIT_shouldReturnTask_whenTaskExistsAndBelongsToUser() throws Exception {
+        TaskResponse expectedResponse = TaskResponseTestDataFactory.buildTaskResponse();
+
+        isOwnerReturn(true);
+        when(taskService.getTaskById(TASK_ID))
+                .thenReturn(expectedResponse);
+
+
+        MvcResult result = mockMvc.perform(get("/api/task/{id}", TASK_ID))
+                .andExpect(status().isOk())
+                .andReturn();
+        TaskResponse actualResponse = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                TaskResponse.class
+        );
+
+        assertThat(actualResponse)
+                .isEqualTo(expectedResponse);
+    }
+
+    @Test
+    @WithMockUser
+    void getTaskByIdIT_shouldReturnStatus404_whenTaskNotFound() throws Exception {
+        isOwnerReturn(true);
+
+        when(taskService.getTaskById(TASK_ID))
+                .thenThrow(new EntityNotFoundException(TaskErrorMessages.taskNotFound(TASK_ID)));
+
+
+        mockMvc.perform(get("/api/task/{id}", TASK_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(GlobalErrorMessages.ENTITY_NOT_FOUND))
+                .andExpect(jsonPath("$.exceptionMessage").value(TaskErrorMessages.taskNotFound(TASK_ID)));
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verify(taskService)
+                .getTaskById(TASK_ID);
+    }
+
+    @Test
+    @WithMockUser
+    void getTaskByIdIT_shouldReturnStatus403_whenTaskNotBelongsToUser() throws Exception {
+        isOwnerReturn(false);
+
+
+        mockMvc.perform(get("/api/task/{id}", TASK_ID))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(GlobalErrorMessages.AUTH_DENIED));
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verifyNoInteractions(taskService);
     }
 
     // Happy path
