@@ -110,4 +110,37 @@ public final class ChangeTaskRequestTestDataFactory {
                 status
         );
     }
+
+    public static ChangeTaskRequest buildChangeTaskRequestWithTitle(String title) {
+        return new ChangeTaskRequest(
+                title,
+                TASK_DESCRIPTION,
+                TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE,
+                TASK_TIME_TO_COMPLETE_IN_MINUTES,
+                TASK_IMPORTANCE,
+                TASK_STATUS
+        );
+    }
+
+    public static ChangeTaskRequest buildChangeTaskRequestWithDescription(String description) {
+        return new ChangeTaskRequest(
+                TASK_TITLE,
+                description,
+                TASK_DATE_TIME_WHEN_YOU_NEED_TO_COMPLETE,
+                TASK_TIME_TO_COMPLETE_IN_MINUTES,
+                TASK_IMPORTANCE,
+                TASK_STATUS
+        );
+    }
+
+    public static ChangeTaskRequest buildChangeTaskRequestWithDateTimeWhenYouNeedToComplete(LocalDateTime dateTimeWhenYouNeedToComplete) {
+        return new ChangeTaskRequest(
+                TASK_TITLE,
+                TASK_DESCRIPTION,
+                dateTimeWhenYouNeedToComplete,
+                TASK_TIME_TO_COMPLETE_IN_MINUTES,
+                TASK_IMPORTANCE,
+                TASK_STATUS
+        );
+    }
 }
