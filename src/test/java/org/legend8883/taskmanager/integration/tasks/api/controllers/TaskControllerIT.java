@@ -13,6 +13,7 @@ import org.legend8883.taskmanager.tasks.api.controllers.TaskController;
 import org.legend8883.taskmanager.tasks.api.dto.requests.ChangeTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.requests.CreateTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
+import org.legend8883.taskmanager.tasks.db.enums.Status;
 import org.legend8883.taskmanager.tasks.domain.exceptions.TaskErrorMessages;
 import org.legend8883.taskmanager.tasks.domain.services.TaskService;
 import org.legend8883.taskmanager.tasks.domain.util.TaskSecurity;
@@ -82,16 +83,16 @@ class TaskControllerIT {
     @Test
     @WithMockUser
     void createNewTaskIT_shouldReturnCreatedTask_whenRequestIsValid() throws Exception {
-        CreateTaskRequest createTaskRequest = CreateTaskRequestTestDataFactory.buildCreateTaskRequest();
+        CreateTaskRequest request = CreateTaskRequestTestDataFactory.buildCreateTaskRequest();
         TaskResponse expectedResponse = TaskResponseTestDataFactory.buildTaskResponse();
 
-        when(taskService.createNewTask(createTaskRequest))
+        when(taskService.createNewTask(request))
                 .thenReturn(expectedResponse);
 
 
         MvcResult result = mockMvc.perform(post("/api/task")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(createTaskRequest))
+                        .content(objectMapper.writeValueAsString(request))
                 )
                 .andExpect(status().isCreated())
                 .andReturn();
@@ -103,6 +104,10 @@ class TaskControllerIT {
 
         assertThat(actualResponse)
                 .isEqualTo(expectedResponse);
+
+        verifyNoInteractions(taskSecurity);
+        verify(taskService)
+                .createNewTask(request);
     }
 
     @ParameterizedTest
@@ -119,6 +124,7 @@ class TaskControllerIT {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.violations[0].fieldName").value(expectedFieldName));
 
+        verifyNoInteractions(taskSecurity);
         verifyNoInteractions(taskService);
     }
 
@@ -142,14 +148,17 @@ class TaskControllerIT {
 
         assertThat(actualResponse)
                 .isEqualTo(expectedResponse);
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verify(taskService)
+                .getTaskById(TASK_ID);
     }
 
     @Test
     @WithMockUser
     void getTaskByIdIT_shouldReturnStatus404_whenTaskNotFound() throws Exception {
-        isOwnerReturn(true);
-
-        when(taskService.getTaskById(TASK_ID))
+        when(taskSecurity.isOwner(eq(TASK_ID), any()))
                 .thenThrow(new EntityNotFoundException(TaskErrorMessages.taskNotFound(TASK_ID)));
 
 
@@ -160,8 +169,7 @@ class TaskControllerIT {
 
         verify(taskSecurity)
                 .isOwner(eq(TASK_ID), any());
-        verify(taskService)
-                .getTaskById(TASK_ID);
+        verifyNoInteractions(taskService);
     }
 
     @Test
@@ -202,6 +210,10 @@ class TaskControllerIT {
 
         assertThat(actualResponses)
                 .containsExactlyInAnyOrderElementsOf(expectedResponses);
+
+        verifyNoInteractions(taskSecurity);
+        verify(taskService)
+                .getAllUserTasks(null, null);
     }
 
     @Test
@@ -293,14 +305,111 @@ class TaskControllerIT {
         verifyNoInteractions(taskService);
     }
 
-    // Happy path
     @Test
-    void completeTask() {
+    @WithMockUser
+    void completeTaskIT_shouldReturnCompletedTask_whenTaskFinished() throws Exception {
+        TaskResponse expectedResponse = TaskResponseTestDataFactory.buildTaskResponseWithStatus(Status.FINISHED);
+
+        isOwnerReturn(true);
+        when(taskService.completeTask(TASK_ID))
+                .thenReturn(expectedResponse);
+
+
+        MvcResult result = mockMvc.perform(patch("/api/task/complete/{id}", TASK_ID))
+                .andExpect(status().isOk())
+                .andReturn();
+        TaskResponse actualResponse = objectMapper.readValue(
+                result.getResponse().getContentAsString(),
+                TaskResponse.class
+        );
+
+        assertThat(actualResponse)
+                .isEqualTo(expectedResponse);
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verify(taskService)
+                .completeTask(TASK_ID);
     }
 
-    // Happy path
     @Test
-    void deleteTaskById() {
+    @WithMockUser
+    void completeTaskIT_shouldReturnStatus404_whenTaskNotFound() throws Exception {
+        when(taskSecurity.isOwner(eq(TASK_ID), any()))
+                .thenThrow(new EntityNotFoundException(TaskErrorMessages.taskNotFound(TASK_ID)));
+
+
+        mockMvc.perform(patch("/api/task/complete/{id}", TASK_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(GlobalErrorMessages.ENTITY_NOT_FOUND))
+                .andExpect(jsonPath("$.exceptionMessage").value(TaskErrorMessages.taskNotFound(TASK_ID)));
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verifyNoInteractions(taskService);
+    }
+
+    @Test
+    @WithMockUser
+    void completeTaskIT_shouldReturnStatus403_whenTaskNotBelongsToUser() throws Exception {
+        isOwnerReturn(false);
+
+
+        mockMvc.perform(patch("/api/task/complete/{id}", TASK_ID))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(GlobalErrorMessages.AUTH_DENIED));
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verifyNoInteractions(taskService);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteTaskByIdIT_shouldReturnStatus200_whenTaskDeleted() throws Exception {
+        isOwnerReturn(true);
+        doNothing().when(taskService).deleteTaskById(TASK_ID);
+
+
+        mockMvc.perform(delete("/api/task/{id}", TASK_ID))
+                .andExpect(status().isOk());
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verify(taskService)
+                .deleteTaskById(TASK_ID);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteTaskByIdIT_shouldReturnStatus404_whenTaskNotFound() throws Exception {
+        when(taskSecurity.isOwner(eq(TASK_ID), any()))
+                .thenThrow(new EntityNotFoundException(TaskErrorMessages.taskNotFound(TASK_ID)));
+
+
+        mockMvc.perform(delete("/api/task/{id}", TASK_ID))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.message").value(GlobalErrorMessages.ENTITY_NOT_FOUND))
+                .andExpect(jsonPath("$.exceptionMessage").value(TaskErrorMessages.taskNotFound(TASK_ID)));
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verifyNoInteractions(taskService);
+    }
+
+    @Test
+    @WithMockUser
+    void deleteTaskByIdIT_shouldReturnStatus403_whenTaskNotBelongsToUser() throws Exception {
+        isOwnerReturn(false);
+
+
+        mockMvc.perform(delete("/api/task/{id}", TASK_ID))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value(GlobalErrorMessages.AUTH_DENIED));
+
+        verify(taskSecurity)
+                .isOwner(eq(TASK_ID), any());
+        verifyNoInteractions(taskService);
     }
 
     private void isOwnerReturn(boolean returnValue) {
