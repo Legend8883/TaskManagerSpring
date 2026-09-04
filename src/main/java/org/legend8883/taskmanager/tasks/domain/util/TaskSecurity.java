@@ -25,8 +25,7 @@ public class TaskSecurity {
         TaskEntity taskEntity = taskRepository.findById(taskId)
                 .orElseThrow(() -> new EntityNotFoundException(TaskErrorMessages.taskNotFound(taskId)));
 
-        SecurityUser securityUser = (SecurityUser) authentication.getPrincipal();
-        String username = securityUser.getUsername();
+        String username = authentication.getName();
 
         UserEntity userEntity = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(UserErrorMessages.userNotFound(username)));

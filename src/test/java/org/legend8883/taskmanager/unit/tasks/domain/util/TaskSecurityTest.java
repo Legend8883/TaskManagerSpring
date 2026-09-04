@@ -45,13 +45,12 @@ class TaskSecurityTest {
     void isOwnerTest_shouldReturnTrue_whenTaskBelongsToUser() {
         TaskEntity taskEntity = TaskEntityTestDataFactory.buildTaskEntity();
         UserEntity userEntity = TaskTestFields.TASK_USER;
-        SecurityUser securityUser = new SecurityUser(userEntity);
-        String username = securityUser.getUsername();
+        String username = userEntity.getUsername();
 
         when(taskRepository.findById(TASK_ID))
                 .thenReturn(Optional.of(taskEntity));
-        when(authentication.getPrincipal())
-                .thenReturn(securityUser);
+        when(authentication.getName())
+                .thenReturn(username);
         when(userRepository.findByUsername(username))
                 .thenReturn(Optional.of(userEntity));
 
@@ -67,13 +66,12 @@ class TaskSecurityTest {
     void isOwnerTest_shouldReturnFalse_whenTaskNotBelongsToUser() {
         TaskEntity taskEntity = TaskEntityTestDataFactory.buildTaskEntity();
         UserEntity userEntityWithOtherTask = TaskTestFields.DIFFERENT_TASK_USER;
-        SecurityUser securityUser = new SecurityUser(userEntityWithOtherTask);
-        String username = securityUser.getUsername();
+        String username = userEntityWithOtherTask.getUsername();
 
         when(taskRepository.findById(TASK_ID))
                 .thenReturn(Optional.of(taskEntity));
-        when(authentication.getPrincipal())
-                .thenReturn(securityUser);
+        when(authentication.getName())
+                .thenReturn(username);
         when(userRepository.findByUsername(username))
                 .thenReturn(Optional.of(userEntityWithOtherTask));
 
@@ -102,13 +100,12 @@ class TaskSecurityTest {
     void isOwnerTest_shouldThrowException_whenUserNotFound() {
         TaskEntity taskEntity = TaskEntityTestDataFactory.buildTaskEntity();
         UserEntity userEntity = TaskTestFields.TASK_USER;
-        SecurityUser securityUser = new SecurityUser(userEntity);
-        String username = securityUser.getUsername();
+        String username = userEntity.getUsername();
 
         when(taskRepository.findById(TASK_ID))
                 .thenReturn(Optional.of(taskEntity));
-        when(authentication.getPrincipal())
-                .thenReturn(securityUser);
+        when(authentication.getName())
+                .thenReturn(username);
         when(userRepository.findByUsername(username))
                 .thenReturn(Optional.empty());
 
