@@ -6,6 +6,9 @@ import org.legend8883.taskmanager.auth.domain.exceptions.AuthException;
 import org.legend8883.taskmanager.users.db.repositories.UserRepository;
 import org.springframework.stereotype.Component;
 
+import static org.legend8883.taskmanager.auth.domain.exceptions.AuthErrorMessages.DIFFERENT_PASSWORDS;
+import static org.legend8883.taskmanager.auth.domain.exceptions.AuthErrorMessages.REPEATED_USERNAME;
+
 @Component
 @RequiredArgsConstructor
 public class RegistrationManager {
@@ -16,7 +19,7 @@ public class RegistrationManager {
         String confirmPassword = request.confirmPassword();
 
         if (!originalPassword.equals(confirmPassword)) {
-            throw new AuthException("Passwords in registration don't match");
+            throw new AuthException(DIFFERENT_PASSWORDS);
         }
     }
 
@@ -24,7 +27,7 @@ public class RegistrationManager {
         String username = request.username();
 
         if (userRepository.existsByUsername(username)) {
-            throw new AuthException("Username is already in use");
+            throw new AuthException(REPEATED_USERNAME);
         }
     }
 }

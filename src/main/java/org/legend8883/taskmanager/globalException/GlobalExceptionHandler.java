@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static org.legend8883.taskmanager.globalException.messages.GlobalErrorMessages.*;
+
 @Slf4j
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -31,7 +33,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
 
         return new BaseErrorResponse(
-                "Server error, try again",
+                SERVER_ERROR,
                 e.getMessage(),
                 LocalDateTime.now()
         );
@@ -86,7 +88,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
 
         return new BaseErrorResponse(
-                "Authentication error",
+                AUTH_ERROR,
                 e.getMessage(),
                 LocalDateTime.now()
         );
@@ -101,7 +103,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
 
         return new BaseErrorResponse(
-                "Wrong username or password",
+                BAD_CREDENTIALS,
                 e.getMessage(),
                 LocalDateTime.now()
         );
@@ -116,7 +118,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
 
         return new BaseErrorResponse(
-                "You are not authorized to perform this action",
+                AUTH_DENIED,
                 e.getMessage(),
                 LocalDateTime.now()
         );
@@ -131,7 +133,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
 
         return new BaseErrorResponse(
-                "User not found",
+                USER_NOT_FOUND,
                 e.getMessage(),
                 LocalDateTime.now()
         );
@@ -146,7 +148,7 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
 
         return new BaseErrorResponse(
-                "Entity not found",
+                ENTITY_NOT_FOUND,
                 e.getMessage(),
                 LocalDateTime.now()
         );

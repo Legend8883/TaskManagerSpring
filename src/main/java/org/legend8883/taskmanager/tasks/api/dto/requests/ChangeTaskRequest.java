@@ -10,11 +10,11 @@ import java.time.LocalDateTime;
 
 public record ChangeTaskRequest(
         @Nullable
-        @Size(min = 1)
+        @Size(min = 3)
         String title,
 
         @Nullable
-        @Size(min = 1)
+        @Size(min = 3)
         String description,
 
         @Nullable

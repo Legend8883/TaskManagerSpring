@@ -1,4 +1,4 @@
-package org.legend8883.taskmanager.tasks.domain.services;
+package org.legend8883.taskmanager.tasks.domain.util;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
-public class ChangeTaskManager {
+public class ChangeTaskUtil {
     public TaskEntity getChangedTaskEntity(
             TaskEntity taskEntity,
             ChangeTaskRequest request

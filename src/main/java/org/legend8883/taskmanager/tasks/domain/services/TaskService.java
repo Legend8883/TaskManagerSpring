@@ -1,19 +1,11 @@
 package org.legend8883.taskmanager.tasks.domain.services;
 
-import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.legend8883.taskmanager.misc.PageableCreator;
 import org.legend8883.taskmanager.tasks.api.dto.requests.ChangeTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.requests.CreateTaskRequest;
 import org.legend8883.taskmanager.tasks.api.dto.responses.TaskResponse;
-import org.legend8883.taskmanager.tasks.db.entities.TaskEntity;
-import org.legend8883.taskmanager.tasks.db.enums.Status;
-import org.legend8883.taskmanager.tasks.db.repositories.TaskRepository;
-import org.legend8883.taskmanager.tasks.domain.mappers.TaskMapper;
-import org.legend8883.taskmanager.users.db.entities.UserEntity;
-import org.legend8883.taskmanager.users.domain.services.UserManager;
-import org.springframework.data.domain.Pageable;
+import org.legend8883.taskmanager.tasks.domain.services.managers.*;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,73 +14,37 @@ import java.util.List;
 @RequiredArgsConstructor
 @Slf4j
 public class TaskService {
-    private final TaskRepository taskRepository;
-    private final UserManager userManager;
-    private final TaskMapper taskMapper;
-    private final PageableCreator pageableCreator;
+    private final CreateTaskManager createTaskManager;
+    private final GetTaskByIdManager getTaskByIdManager;
+    private final GetAllUserTasksManager getAllUserTasksManager;
     private final ChangeTaskManager changeTaskManager;
+    private final CompleteTaskManager completeTaskManager;
+    private final DeleteTaskByIdManager deleteTaskByIdManager;
 
     public TaskResponse createNewTask(CreateTaskRequest request) {
-        UserEntity currentUser = userManager.getCurrentUser();
-
-        TaskEntity newTask = TaskEntity.builder()
-                .user(currentUser)
-                .title(request.title())
-                .description(request.description())
-                .dateTimeWhenYouNeedToComplete(request.dateTimeWhenYouNeedToComplete())
-                .timeToCompleteInMinutes(request.timeToCompleteInMinutes())
-                .importance(request.importance())
-                .build();
-
-        taskRepository.save(newTask);
-        log.info("Created new task with id {}", newTask.getId());
-        return taskMapper.entityToResponse(newTask);
+        return createTaskManager.create(request);
     }
 
     public TaskResponse getTaskById(Long id) {
-        TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found"));
-
-        return taskMapper.entityToResponse(taskEntity);
+        return getTaskByIdManager.get(id);
     }
 
     public List<TaskResponse> getAllUserTasks(Integer pageSize, Integer pageNum) {
-        UserEntity currentUser = userManager.getCurrentUser();
-
-        Pageable pageable = pageableCreator.assemble(pageSize, pageNum);
-
-        List<TaskEntity> userTasks = taskRepository.findAllByUser(currentUser, pageable);
-
-        return taskMapper.entitiesToResponses(userTasks);
+        return getAllUserTasksManager.get(pageSize, pageNum);
     }
 
     public TaskResponse changeTask(
             Long id,
             ChangeTaskRequest request
     ) {
-        TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found"));
-
-        TaskEntity changedTaskEntity = changeTaskManager.getChangedTaskEntity(taskEntity, request);
-
-        TaskEntity savedTask = taskRepository.save(changedTaskEntity);
-        log.info("Changed task with id {} ", savedTask.getId());
-        return taskMapper.entityToResponse(savedTask);
+        return changeTaskManager.change(id, request);
     }
 
     public TaskResponse completeTask(Long id) {
-        TaskEntity taskEntity = taskRepository.findById(id)
-                .orElseThrow(() -> new EntityNotFoundException("Task with id " + id + " not found"));
-
-        taskEntity.setStatus(Status.FINISHED);
-
-        TaskEntity savedTask = taskRepository.save(taskEntity);
-        log.info("Completed task with id {} ", savedTask.getId());
-        return taskMapper.entityToResponse(savedTask);
+        return completeTaskManager.complete(id);
     }
 
     public void deleteTaskById(Long id) {
-        taskRepository.deleteById(id);
-        log.info("Deleted task with id {}", id);
+        deleteTaskByIdManager.delete(id);
     }
 }
